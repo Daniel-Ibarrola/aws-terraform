@@ -25,13 +25,14 @@ resource "aws_vpc" "main" {
 }
 
 resource "aws_subnet" "ats-public-subnet" {
-  vpc_id                  = aws_vpc.main.id
-  cidr_block              = "10.0.5.0/24"
-  availability_zone       = "us-west-2c"
+  count             = length(var.public_subnet_cidrs)
+  vpc_id            = aws_vpc.main.id
+  cidr_block = var.public_subnet_cidrs[count.index]
+  availability_zone = data.aws_availability_zones.available.names[count.index % length(data.aws_availability_zones.available.names)]
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "ats-public-subnet"
+    Name = "ats-public-subnet-${count.index}"
   }
 }
 
@@ -39,7 +40,6 @@ resource "aws_subnet" "ats-private-subnet" {
   count             = length(var.private_subnet_cidrs)
   vpc_id            = aws_vpc.main.id
   cidr_block = var.private_subnet_cidrs[count.index]
-  # Cycle through available AZs; ensure you have enough AZs for your subnet count
   availability_zone = data.aws_availability_zones.available.names[count.index % length(data.aws_availability_zones.available.names)]
 
   tags = {
@@ -67,7 +67,8 @@ resource "aws_route_table" "public_route_table" {
 }
 
 resource "aws_route_table_association" "public-subnet-association" {
-  subnet_id      = aws_subnet.ats-public-subnet.id
+  count          = length(aws_subnet.ats-public-subnet)
+  subnet_id      = aws_subnet.ats-public-subnet[count.index].id
   route_table_id = aws_route_table.public_route_table.id
 }
 
