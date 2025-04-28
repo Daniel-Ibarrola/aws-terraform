@@ -13,7 +13,8 @@ variable "environment" {
 variable "app_port" {
   description = "The port where the client app will run"
   type        = number
-  default     = 3000
+  # TODO: make sure port is ok
+  default     = 80
 }
 
 variable "app_image_uri" {

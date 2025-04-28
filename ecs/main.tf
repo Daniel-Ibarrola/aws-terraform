@@ -113,7 +113,8 @@ resource "aws_lb_target_group" "ats_client_alb_tg" {
   health_check {
     enabled             = true
     interval            = 30
-    path                = "/health"
+    # TODO: custom health check path
+    path                = "/"
     port                = "traffic-port"
     protocol            = "HTTP"
     timeout             = 5
