@@ -36,7 +36,7 @@ data "aws_subnets" "ats_public_subnets" {
   }
   filter {
     name   = "tag:Name"
-    values = ["ats-public-subnet*"]
+    values = ["ats-public-subnet-*"]
   }
 }
 
