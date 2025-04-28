@@ -8,7 +8,12 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-west-2"
+  region = var.aws_region
+}
+
+# Fetch available AZs in the region
+data "aws_availability_zones" "available" {
+  state = "available"
 }
 
 resource "aws_vpc" "main" {
@@ -30,33 +35,15 @@ resource "aws_subnet" "ats-public-subnet" {
   }
 }
 
-resource "aws_subnet" "ats-private-subnet_a" {
+resource "aws_subnet" "ats-private-subnet" {
+  count             = length(var.private_subnet_cidrs)
   vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.2.0/24"
-  availability_zone = "us-west-2a"
+  cidr_block = var.private_subnet_cidrs[count.index]
+  # Cycle through available AZs; ensure you have enough AZs for your subnet count
+  availability_zone = data.aws_availability_zones.available.names[count.index % length(data.aws_availability_zones.available.names)]
 
   tags = {
-    Name = "ats-private-subnet_a"
-  }
-}
-
-resource "aws_subnet" "ats-private-subnet_b" {
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.3.0/24"
-  availability_zone = "us-west-2b"
-
-  tags = {
-    Name = "ats-private-subnet_b"
-  }
-}
-
-resource "aws_subnet" "ats-private-subnet_c" {
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.4.0/24"
-  availability_zone = "us-west-2c"
-
-  tags = {
-    Name = "ats-private-subnet_c"
+    Name = "ats-private-subnet-${count.index}"
   }
 }
 
@@ -92,17 +79,8 @@ resource "aws_route_table" "private_route_table" {
   }
 }
 
-resource "aws_route_table_association" "private-subnet-association-a" {
-  subnet_id      = aws_subnet.ats-private-subnet_a.id
-  route_table_id = aws_route_table.private_route_table.id
-}
-
-resource "aws_route_table_association" "private-subnet-association-b" {
-  subnet_id      = aws_subnet.ats-private-subnet_b.id
-  route_table_id = aws_route_table.private_route_table.id
-}
-
-resource "aws_route_table_association" "private-subnet-association-c" {
-  subnet_id      = aws_subnet.ats-private-subnet_c.id
+resource "aws_route_table_association" "private-subnet-association" {
+  count          = length(aws_subnet.ats-private-subnet)
+  subnet_id      = aws_subnet.ats-private-subnet[count.index].id
   route_table_id = aws_route_table.private_route_table.id
 }
