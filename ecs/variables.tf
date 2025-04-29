@@ -59,5 +59,5 @@ variable "subdomain_name" {
   description = "The subdomain part (e.g., 'app' for app.your-app-domain.com, or leave empty/null for root domain)"
   type        = string
   # TODO: update subdomain name
-  default     = "test-ecs"
+  default = "test-ecs"
 }
