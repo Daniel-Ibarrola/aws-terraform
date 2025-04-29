@@ -14,7 +14,7 @@ variable "app_port" {
   description = "The port where the client app will run"
   type        = number
   # TODO: make sure port is ok
-  default     = 80
+  default = 80
 }
 
 variable "app_image_uri" {
@@ -46,4 +46,18 @@ variable "container_name" {
   description = "Name of the container that will run the ATS client"
   type        = string
   default     = "ats-client-container"
+}
+
+variable "domain_name" {
+  description = "The root domain name you own (e.g., your-app-domain.com)"
+  type        = string
+  # TODO: update domain name
+  default = "servicios-cires.net"
+}
+
+variable "subdomain_name" {
+  description = "The subdomain part (e.g., 'app' for app.your-app-domain.com, or leave empty/null for root domain)"
+  type        = string
+  # TODO: update subdomain name
+  default     = "test-ecs"
 }

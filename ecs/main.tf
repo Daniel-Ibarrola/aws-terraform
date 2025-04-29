@@ -48,6 +48,11 @@ data "aws_route_tables" "ats_private_rts" {
   }
 }
 
+data "aws_route53_zone" "primary" {
+  name         = trimsuffix(var.domain_name, ".") # Ensure no trailing dot
+  private_zone = false
+}
+
 # --- Check if subnets were found ---
 # This will cause Terraform plan/apply to fail if no matching subnets are found
 resource "null_resource" "validate_subnets_found" {
@@ -69,6 +74,50 @@ resource "null_resource" "validate_subnets_found" {
   }
 }
 
+resource "aws_acm_certificate" "app_cert" {
+  domain_name       = local.full_domain_name
+  validation_method = "DNS"
+
+  tags = {
+    Name        = "${local.full_domain_name} Certificate"
+    Environment = var.environment
+  }
+
+  lifecycle {
+    create_before_destroy = true # Allows replacing certificate easily later
+  }
+}
+
+locals {
+  full_domain_name = var.subdomain_name == "" ? var.domain_name : "${var.subdomain_name}.${var.domain_name}"
+}
+
+# Creates the CNAME record required by ACM to prove domain ownership
+resource "aws_route53_record" "cert_validation" {
+  # Allow multiple validation records if subject_alternative_names are used
+  for_each = {
+    for dvo in aws_acm_certificate.app_cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  allow_overwrite = true # Useful if validation needs retrying
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = data.aws_route53_zone.primary.zone_id
+}
+
+
+# TODO: move certificate creation and validation out. It can take too long to be run in a bitbucket pipeline
+
+resource "aws_acm_certificate_validation" "cert" {
+  certificate_arn         = aws_acm_certificate.app_cert.arn
+  validation_record_fqdns = [for record in aws_route53_record.cert_validation : record.fqdn]
+}
 
 resource "aws_security_group" "ats_client_alb_sg" {
   name        = "ATS Client ALB Security Group"
@@ -83,11 +132,24 @@ resource "aws_security_group" "ats_client_alb_sg" {
     description = "Allow HTTP traffic from anywhere"
   }
 
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "Allow HTTPS traffic from anywhere"
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name        = "ATS Client ALB Security Group"
+    Environment = var.environment
   }
 }
 
@@ -99,7 +161,8 @@ resource "aws_alb" "ats_client_alb" {
   security_groups    = [aws_security_group.ats_client_alb_sg.id]
 
   tags = {
-    Name = "ATS Client ALB"
+    Name        = "ATS Client ALB"
+    Environment = var.environment
   }
 }
 
@@ -111,8 +174,8 @@ resource "aws_lb_target_group" "ats_client_alb_tg" {
   vpc_id      = data.aws_vpc.target_vpc.id
 
   health_check {
-    enabled             = true
-    interval            = 30
+    enabled  = true
+    interval = 30
     # TODO: custom health check path
     path                = "/"
     port                = "traffic-port"
@@ -124,14 +187,49 @@ resource "aws_lb_target_group" "ats_client_alb_tg" {
   }
 }
 
+resource "aws_lb_listener" "ecs_alb_listener_https" {
+  load_balancer_arn = aws_alb.ats_client_alb.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = aws_acm_certificate_validation.cert.certificate_arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.ats_client_alb_tg.arn
+  }
+
+  depends_on = [aws_acm_certificate_validation.cert]
+}
+
 resource "aws_lb_listener" "ecs_alb_listener" {
   load_balancer_arn = aws_alb.ats_client_alb.arn
   port              = 80
   protocol          = "HTTP"
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.ats_client_alb_tg.arn
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+      host        = "#{host}"  # Keep the original host
+      path        = "/#{path}" # Keep the original path
+      query       = "#{query}" # Keep the original query string
+    }
+  }
+}
+
+resource "aws_route53_record" "app_alias" {
+  zone_id = data.aws_route53_zone.primary.zone_id
+  name    = local.full_domain_name
+  type    = "A"
+
+  alias {
+    name                   = aws_alb.ats_client_alb.dns_name
+    zone_id                = aws_alb.ats_client_alb.zone_id
+    evaluate_target_health = true
   }
 }
 
