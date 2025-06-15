@@ -22,6 +22,7 @@ variable "app_image_uri" {
   type        = string
   # Make sure this variable is populated when running terraform apply
   # e.g., terraform apply -var="app_image_uri=123456789012.dkr.ecr.us-west-2.amazonaws.com/ats-client:commitsha"
+  default = "668144156539.dkr.ecr.us-west-2.amazonaws.com/tests/nginx"
 }
 
 variable "desired_task_count" {
