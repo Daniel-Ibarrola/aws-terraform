@@ -18,7 +18,7 @@ resource "aws_ecs_task_definition" "servicios_cires_client_task_def" {
     {
       name          = var.container_name
       image         = var.app_image_uri
-      image_version = timestamp()
+      # image_version = timestamp()
       cpu           = var.fargate_cpu
       memory        = var.fargate_memory
       essential     = true

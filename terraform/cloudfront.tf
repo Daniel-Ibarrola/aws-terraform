@@ -2,6 +2,8 @@ resource "aws_cloudfront_distribution" "servicios_cires_alb_distribution" {
   enabled     = true
   price_class = "PriceClass_100"
 
+  aliases = [local.full_domain_name]
+
   origin {
     domain_name = aws_alb.servicios_cires_alb.dns_name
     origin_id   = "servicios-cires-alb-origin"
