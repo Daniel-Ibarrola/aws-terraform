@@ -1,3 +1,4 @@
 .terraform/
 env.sh
 *.tfvars
+node_modules

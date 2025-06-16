@@ -21,7 +21,7 @@ resource "aws_lb_target_group" "servicios_cires_tg" {
   health_check {
     enabled             = true
     interval            = 30
-    path                = "/health"
+    path                = "/"
     port                = "traffic-port"
     protocol            = "HTTP"
     timeout             = 5
