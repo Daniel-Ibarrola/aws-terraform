@@ -152,7 +152,8 @@ resource "aws_ecs_service" "servicios_cires_server_service" {
       discovery_name = "server-api"
       client_alias {
         port     = var.server_app_port
-        dns_name = "server-api.servicios-cires-namespace-${local.env}"
+        # DNS name must include namespace
+        dns_name = "server-api.${aws_service_discovery_http_namespace.service_connect_namespace.name}"
       }
     }
   }
