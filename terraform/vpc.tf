@@ -121,3 +121,18 @@ resource "aws_vpc_endpoint" "s3_gateway" {
     Name = "S3 Gateway Endpoint QA"
   }
 }
+
+resource "aws_vpc_endpoint" "cloudwatch_logs" {
+  vpc_id              = aws_vpc.servicios_cires_vpc.id
+  service_name        = "com.amazonaws.${var.aws_region}.logs"
+  vpc_endpoint_type   = "Interface"
+  private_dns_enabled = true
+
+  subnet_ids         = [for subnet in aws_subnet.servicios-cires-private-subnet : subnet.id]
+  security_group_ids = [aws_security_group.vpc_endpoint_sg.id]
+
+  tags = {
+    Name        = "CloudWatch Logs Endpoint"
+    Environment = var.environment
+  }
+}
