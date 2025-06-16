@@ -13,7 +13,7 @@ resource "aws_alb" "servicios_cires_alb" {
 
 resource "aws_lb_target_group" "servicios_cires_tg" {
   name        = "servicios-cires-tg"
-  port        = var.app_port
+  port        = var.client_app_port
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = aws_vpc.servicios_cires_vpc.id

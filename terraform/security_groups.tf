@@ -31,8 +31,8 @@ resource "aws_security_group" "servicios_cires_client_service_sg" {
 
   ingress {
     description     = "Allow traffic from ALB security group"
-    from_port       = var.app_port
-    to_port         = var.app_port
+    from_port       = var.client_app_port
+    to_port         = var.client_app_port
     protocol        = "tcp"
     security_groups = [aws_security_group.servicios_cires_alb_sg.id]
   }
@@ -57,11 +57,14 @@ resource "aws_security_group" "vpc_endpoint_sg" {
   vpc_id      = aws_vpc.servicios_cires_vpc.id
 
   ingress {
-    description     = "Allow HTTPS from ECS tasks"
-    from_port       = 443
-    to_port         = 443
-    protocol        = "tcp"
-    security_groups = [aws_security_group.servicios_cires_client_service_sg.id]
+    description = "Allow HTTPS from ECS tasks"
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    security_groups = [
+      aws_security_group.servicios_cires_client_service_sg.id,
+      aws_security_group.servicios_cires_server_service_sg.id
+    ]
   }
 
   egress {
@@ -72,7 +75,44 @@ resource "aws_security_group" "vpc_endpoint_sg" {
   }
 
   tags = {
-    Name        = "VPC Endpoint SG"
-    Env = local.env
+    Name = "VPC Endpoint SG"
+    Env  = local.env
+  }
+}
+
+resource "aws_security_group" "servicios_cires_server_service_sg" {
+  name        = "servicios-cires-server-task-sg-${local.env}"
+  description = "Allow traffic to Servicios Cires Server tasks from Client service only"
+  vpc_id      = aws_vpc.servicios_cires_vpc.id
+
+  ingress {
+    description = "Allow traffic from Client service security group"
+    from_port   = var.server_app_port
+    to_port     = var.server_app_port
+    protocol    = "tcp"
+    security_groups = [
+      aws_security_group.servicios_cires_client_service_sg.id,
+    ]
+  }
+
+  # This is needed for Service Connect to work properly
+  ingress {
+    description = "Allow Service Connect proxy traffic"
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    self        = true
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1" # All protocols
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "Servicios Cires Server Task SG"
+    Env  = local.env
   }
 }

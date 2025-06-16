@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import type {Pet} from '../types';
+import {API_URL} from "../constants.ts";
 
 const PetList = () => {
     const [pets, setPets] = useState<Pet[]>([]);
@@ -11,7 +12,7 @@ const PetList = () => {
         const fetchPets = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get<Pet[]>('http://localhost:3000/api/pets');
+                const response = await axios.get<Pet[]>(API_URL);
                 setPets(response.data);
                 setError(null);
             } catch (err) {

@@ -20,22 +20,10 @@ variable "environment" {
   type        = string
 }
 
-variable "app_port" {
-  description = "The port where the client app will run"
-  type        = number
-  # TODO: make sure port is ok
-  default = 80
-}
-
-variable "app_image_uri" {
-  description = "The full ECR URI of the application image to deploy"
-  type        = string
-}
-
 variable "desired_task_count" {
   description = "Number of application tasks to run"
   type        = number
-  default     = 1
+  default     = 2
 }
 
 variable "fargate_cpu" {
@@ -50,12 +38,6 @@ variable "fargate_memory" {
   default     = 1024
 }
 
-variable "container_name" {
-  description = "Name of the container that will run the app"
-  type        = string
-  default     = "client-container"
-}
-
 variable "domain_name" {
   description = "The root domain name you own (e.g., your-app-domain.com)"
   type        = string
@@ -63,5 +45,39 @@ variable "domain_name" {
 
 variable "subdomain_name" {
   description = "The subdomain part (e.g., 'app' for app.your-app-domain.com, or leave empty/null for root domain)"
+  type        = string
+}
+
+variable "client_container_name" {
+  description = "Name of the client container"
+  type        = string
+  default     = "client-container"
+}
+
+variable "client_app_port" {
+  description = "The port where the client app will run"
+  type        = number
+  default     = 80
+}
+
+variable "client_app_image_uri" {
+  description = "The full ECR URI of the client image to deploy"
+  type        = string
+}
+
+variable "server_container_name" {
+  description = "Name of the server container"
+  type        = string
+  default     = "client-container"
+}
+
+variable "server_app_port" {
+  description = "The port where the client app will run"
+  type        = number
+  default     = 3000
+}
+
+variable "server_app_image_uri" {
+  description = "The full ECR URI of the server image to deploy"
   type        = string
 }

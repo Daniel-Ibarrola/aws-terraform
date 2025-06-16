@@ -5,5 +5,5 @@ output "alb_dns_name" {
 
 output "route53_record_name" {
   description = "Name of the route 53 record"
-  value = aws_route53_record.alias_record_to_cloudfront_distribution.name
+  value       = aws_route53_record.alias_record_to_cloudfront_distribution.name
 }
