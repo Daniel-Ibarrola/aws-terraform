@@ -1,0 +1,15 @@
+services:
+  server:
+    build: ./services/server
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - CLIENT_URL=http://localhost
+
+  client:
+    build: ./services/client
+    ports:
+      - "80:80"
+    depends_on:
+      - server
