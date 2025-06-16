@@ -5,3 +5,5 @@ docker push 668144156539.dkr.ecr.us-west-2.amazonaws.com/tests/pet-client
 
 docker buildx build --platform linux/amd64 -t 668144156539.dkr.ecr.us-west-2.amazonaws.com/tests/pet-server:latest .
 docker push 668144156539.dkr.ecr.us-west-2.amazonaws.com/tests/pet-server
+
+aws ecs describe-services --cluster servicios-cires-cluster-qa --services servicios_cires-client-service-qa

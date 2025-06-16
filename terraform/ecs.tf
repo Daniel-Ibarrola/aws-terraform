@@ -28,7 +28,7 @@ resource "aws_ecs_task_definition" "servicios_cires_client_task_def" {
     {
       name  = var.client_container_name
       image = var.client_app_image_uri
-      # image_version = timestamp()
+      image_version = timestamp()
       cpu       = var.fargate_cpu
       memory    = var.fargate_memory
       essential = true
@@ -122,14 +122,6 @@ resource "aws_ecs_service" "servicios_cires_client_service" {
   service_connect_configuration {
     enabled   = true
     namespace = aws_service_discovery_http_namespace.service_connect_namespace.arn
-
-    service {
-      client_alias {
-        port     = var.server_app_port
-        dns_name = "server-api"
-      }
-      port_name = "client-web"
-    }
   }
 
   tags = {
@@ -160,7 +152,7 @@ resource "aws_ecs_service" "servicios_cires_server_service" {
       discovery_name = "server-api"
       client_alias {
         port     = var.server_app_port
-        dns_name = "server-api"
+        dns_name = "server-api.servicios-cires-namespace-${local.env}"
       }
     }
   }
