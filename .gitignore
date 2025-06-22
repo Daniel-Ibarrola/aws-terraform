@@ -2,3 +2,5 @@
 env.sh
 *.tfvars
 node_modules
+*.tfstate
+*.tfstate.backup
