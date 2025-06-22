@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/deploy-ecs.iml" filepath="$PROJECT_DIR$/.idea/deploy-ecs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/aws-terraform.iml" filepath="$PROJECT_DIR$/.idea/aws-terraform.iml" />
     </modules>
   </component>
 </project>
