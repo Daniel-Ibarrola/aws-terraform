@@ -1,37 +1,27 @@
-# Containerized Application Infrastructure in AWS
+# AWS Infrastructure Provisioning with Terraform
 
-This repository contains the terraform config files to deploy a containerized application to AWS. It uses ECS in fargate mode as
-the base for this.
+This repository is dedicated to practicing infrastructure provisioning in AWS using Terraform. It serves as a learning platform for setting up and managing cloud resources in a structured and reusable manner. Its purpose is to enable developers and cloud engineers to familiarize themselves with Terraform and AWS services while building practical infrastructure setups.
 
-The following architecture is used:
+## Purpose
 
-- Cloudfront → ALB (public subnet) → ECS cluster (private subnet)
+The primary goal of this repository is to explore how to provision AWS resources using Terraform. This includes creating examples to provision various types of infrastructure, from containerized applications to databases, networking, and more.
 
-## Deploying
+The repository will gradually expand as new infrastructure examples are added.
 
-To deploy the infrastructure first create the backend for terraform state
+## Available Infrastructure Setups
 
-```shell
-cd ./terraform/backend
-terraform init
-terraform apply 
-```
+Below are the infrastructures currently configured in this repository:
 
-Now you can init terraform in the terraform directory
+1. **ECS Web Application**  
+   Provision a containerized web application with a React frontend and an Express backend on AWS ECS with Fargate.  
+   [Learn more](infrastructure/ecs-app/README.md)
 
-```shell
-cd ..
-terraform init
-```
+As additional examples are developed, they will be linked here.
 
-This is only needed the first time. After that run:
+## Contribution and Expansion
 
-```shell
-terraform apply
-```
+This repository is open for expansion with more examples of AWS infrastructure setups. Contributions are welcome to add variety and complexity to the examples provided. Each infrastructure example will reside in a dedicated folder with comprehensive documentation.
 
-To destroy it use 
+As the repository grows, it is recommended to follow the README file for each infrastructure example for specific instructions and details.
 
-```shell
-terraform destroy
-```
+Feel free to practice and experiment with the configurations to deepen your understanding of Terraform and AWS operations!
