@@ -12,9 +12,13 @@ The repository will gradually expand as new infrastructure examples are added.
 
 Below are the infrastructures currently configured in this repository:
 
-1. **ECS Web Application**  
+1. **EC2 Instance**
+
+2. **Webserver Cluster**
+
+3. **ECS Web Application**  
    Provision a containerized web application with a React frontend and an Express backend on AWS ECS with Fargate.  
-   [Learn more](infrastructure/ecs-app/README.md)
+   [Learn more](infrastructure/stage/services/app-ecs-cluster/README.md)
 
 As additional examples are developed, they will be linked here.
 

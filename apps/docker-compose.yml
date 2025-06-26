@@ -1,6 +1,6 @@
 services:
   server:
-    build: ./apps/server
+    build: ./server
     ports:
       - "3000:3000"
     environment:
@@ -8,7 +8,7 @@ services:
       - CLIENT_URL=http://localhost
 
   client:
-    build: ./apps/client
+    build: ./client
     ports:
       - "80:80"
     depends_on:
