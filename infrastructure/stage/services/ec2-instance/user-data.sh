@@ -1,0 +1,6 @@
+#!/bin/bash
+yum update -y
+yum install -y httpd
+systemctl start httpd
+systemctl enable httpd
+echo "<h1>Hello World from $(hostname -f)</h1><p>DB address: ${db_address}</p><p>DB port ${db_port}</p>" > /var/www/html/index.html

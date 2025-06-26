@@ -3,7 +3,14 @@ resource "aws_launch_template" "web_server_launch_template" {
   instance_type = "t2.micro"
 
   vpc_security_group_ids = [aws_security_group.web_server_sg.id]
-  user_data = filebase64("${path.module}/user-data/user-data.sh")
+  user_data = base64encode(templatefile(
+    "${path.module}/user-data/user-data.sh.tftpl",
+    {
+      db_address = data.terraform_remote_state.db.outputs.address
+      db_port    = data.terraform_remote_state.db.outputs.port
+    }
+  ))
+
 }
 
 resource "aws_autoscaling_group" "web_server_asg" {
