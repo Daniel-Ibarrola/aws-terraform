@@ -1,5 +1,5 @@
 resource "aws_security_group" "load_balancer_sg" {
-  name        = "ALB SG"
+  name        = "${var.cluster_name}-alb-sg"
   description = "Allow traffic from anywhere in port 80"
 
   ingress {
@@ -18,7 +18,7 @@ resource "aws_security_group" "load_balancer_sg" {
 }
 
 resource "aws_security_group" "web_server_sg" {
-  name        = "Web Server SG"
+  name        = "${var.cluster_name}-webserver-sg"
   description = "Allow traffic from ALB security group"
 
   ingress {

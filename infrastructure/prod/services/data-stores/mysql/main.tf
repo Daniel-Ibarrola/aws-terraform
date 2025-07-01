@@ -10,7 +10,7 @@ terraform {
 terraform {
   backend "s3" {
     bucket         = "terraform-state-cires-ac-terraform-up-and-running"
-    key            = "stage/services/data-stores/mysql/terraform.tfstate"
+    key            = "prod/services/data-stores/mysql/terraform.tfstate"
     region         = "us-east-2"
     dynamodb_table = "terraform-up-and-running-locks"
     encrypt        = true
@@ -37,7 +37,7 @@ variable "db_password" {
 module "mysql" {
   source = "../../../../modules/services/data-stores/mysql"
 
-  db_identifier = "my-sql-stage"
+  db_identifier = "my-sql-prod"
   db_instance_class = "db.t3.micro"
 
   db_name     = "example-db"

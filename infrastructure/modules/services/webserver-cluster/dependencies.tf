@@ -13,8 +13,8 @@ data "terraform_remote_state" "db" {
   backend = "s3"
 
   config = {
-    bucket = "terraform-state-cires-ac-terraform-up-and-running"
-    key = "stage/services/data-stores/mysql/terraform.tfstate"
+    bucket = var.db_remote_state_bucket
+    key = var.db_remote_state_key
     region = "us-east-2"
   }
 }

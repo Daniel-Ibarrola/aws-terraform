@@ -1,6 +1,7 @@
 resource "aws_launch_template" "web_server_launch_template" {
   image_id      = "ami-06971c49acd687c30"
-  instance_type = "t2.micro"
+  instance_type = var.instance_type
+  name = "${var.cluster_name}-launch-template"
 
   vpc_security_group_ids = [aws_security_group.web_server_sg.id]
   user_data = base64encode(templatefile(
@@ -14,8 +15,9 @@ resource "aws_launch_template" "web_server_launch_template" {
 }
 
 resource "aws_autoscaling_group" "web_server_asg" {
-  max_size = 10
-  min_size = 1
+  max_size = var.max_size
+  min_size = var.min_size
+  name = "${var.cluster_name}-autoscaling-group"
 
   vpc_zone_identifier = data.aws_subnets.default.ids
 
@@ -30,12 +32,12 @@ resource "aws_autoscaling_group" "web_server_asg" {
   tag {
     key                 = "Name"
     propagate_at_launch = true
-    value               = "webserver"
+    value               = var.cluster_name
   }
 }
 
 resource "aws_alb" "web_server_alb" {
-  name               = "webserver-load-balancer"
+  name               = "${var.cluster_name}-alb"
   load_balancer_type = "application"
   subnets            = data.aws_subnets.default.ids
   security_groups    = [aws_security_group.load_balancer_sg.id]
@@ -58,7 +60,7 @@ resource "aws_lb_listener" "http" {
 }
 
 resource "aws_alb_target_group" "web_server_tg" {
-  name     = "web-server-tg"
+  name     = "${var.cluster_name}-web-server-tg"
   port     = var.server_port
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.default.id
