@@ -34,6 +34,15 @@ resource "aws_autoscaling_group" "web_server_asg" {
     propagate_at_launch = true
     value               = var.cluster_name
   }
+
+  dynamic "tag" {
+    for_each = var.custom_tags
+    content {
+      key = tag.key
+      value = tag.value
+      propagate_at_launch = true
+    }
+  }
 }
 
 resource "aws_alb" "web_server_alb" {
@@ -90,4 +99,28 @@ resource "aws_alb_listener_rule" "forward_to_webserver_tg" {
     type             = "forward"
     target_group_arn = aws_alb_target_group.web_server_tg.arn
   }
+}
+
+resource "aws_autoscaling_schedule" "scale_out_during_business_hours" {
+  count = var.enable_autoscaling ? 1 : 0
+
+  scheduled_action_name = "scale-out-during-business-hours"
+  min_size              = 2
+  max_size              = 10
+  desired_capacity      = 10
+  recurrence            = "0 9 * * *"
+
+  autoscaling_group_name = aws_autoscaling_group.web_server_asg.name
+}
+
+resource "aws_autoscaling_schedule" "scale_in_at_night" {
+  count = var.enable_autoscaling ? 1 : 0
+
+  scheduled_action_name = "scale-in-at-night"
+  min_size              = 2
+  max_size              = 10
+  desired_capacity      = 2
+  recurrence            = "0 17 * * *"
+
+  autoscaling_group_name = aws_autoscaling_group.web_server_asg.name
 }

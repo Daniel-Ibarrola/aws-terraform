@@ -33,3 +33,14 @@ variable "max_size" {
   description = "The maximum number of instances in the ASG"
   type        = number
 }
+
+variable "custom_tags" {
+  description = "Custom tags to set in the instances of the ASG"
+  type = map(string)
+  default = {}
+}
+
+variable "enable_autoscaling" {
+  description = "Whether to enable autoscaling for the webserver cluster"
+  type = bool
+}

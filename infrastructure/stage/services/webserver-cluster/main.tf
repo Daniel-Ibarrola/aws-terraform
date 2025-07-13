@@ -22,4 +22,11 @@ module "webserver_cluster" {
   instance_type = "t3.micro"
   min_size = 1
   max_size = 2
+
+  enable_autoscaling = false
+
+  custom_tags = {
+    Owner = "avengers"
+    ManagedBy = "terraform"
+  }
 }
