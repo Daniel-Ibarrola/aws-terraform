@@ -24,14 +24,6 @@ resource "aws_vpc_security_group_egress_rule" "allow_all_outbound" {
 resource "aws_security_group" "web_server_sg" {
   name        = "${var.cluster_name}-webserver-sg"
   description = "Allow traffic from ALB security group"
-
-
-  egress {
-    from_port   = local.any_port
-    to_port     = local.any_port
-    protocol    = local.any_protocol
-    cidr_blocks = local.all_ips
-  }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "allow_server_port_inbound" {
@@ -43,7 +35,7 @@ resource "aws_vpc_security_group_ingress_rule" "allow_server_port_inbound" {
   referenced_security_group_id = aws_security_group.load_balancer_sg.id
 }
 
-resource "aws_vpc_security_group_egress_rule" "allow_all_outbound" {
+resource "aws_vpc_security_group_egress_rule" "allow_server_all_outbound" {
   security_group_id = aws_security_group.web_server_sg.id
 
   from_port   = local.any_port

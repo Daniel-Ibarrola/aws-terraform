@@ -40,7 +40,7 @@ module "mysql" {
   db_identifier = "my-sql-prod"
   db_instance_class = "db.t3.micro"
 
-  db_name     = "example-db"
+  db_name     = "proddb"
   db_password = var.db_password
   db_username = var.db_username
 }
