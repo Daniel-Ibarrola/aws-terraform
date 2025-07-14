@@ -23,6 +23,8 @@ module "webserver_cluster" {
   min_size = 1
   max_size = 2
 
+  server_text = "Stage Env"
+
   enable_autoscaling = false
 
   custom_tags = {

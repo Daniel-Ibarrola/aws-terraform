@@ -1,5 +1,5 @@
 resource "aws_launch_template" "web_server_launch_template" {
-  image_id      = "ami-06971c49acd687c30"
+  image_id      = var.ami
   instance_type = var.instance_type
   name          = "${var.cluster_name}-launch-template"
 
@@ -9,6 +9,7 @@ resource "aws_launch_template" "web_server_launch_template" {
     {
       db_address = data.terraform_remote_state.db.outputs.address
       db_port    = data.terraform_remote_state.db.outputs.port
+      server_text = var.server_text
     }
   ))
 
@@ -27,6 +28,13 @@ resource "aws_autoscaling_group" "web_server_asg" {
   launch_template {
     id      = aws_launch_template.web_server_launch_template.id
     version = "$Latest"
+  }
+
+  instance_refresh {
+    strategy = "Rolling"
+    preferences {
+      min_healthy_percentage = 50
+    }
   }
 
   tag {

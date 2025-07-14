@@ -44,3 +44,15 @@ variable "enable_autoscaling" {
   description = "Whether to enable autoscaling for the webserver cluster"
   type = bool
 }
+
+variable "ami" {
+  description = "The AMI to run in the cluster"
+  type = string
+  default = "ami-06971c49acd687c30"
+}
+
+variable "server_text" {
+  description = "The text the server returns"
+  type = string
+  default = "Hello World"
+}
