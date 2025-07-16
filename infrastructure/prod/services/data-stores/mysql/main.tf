@@ -41,6 +41,6 @@ module "mysql" {
   db_instance_class = "db.t3.micro"
 
   db_name     = "proddb"
-  db_password = var.db_password
   db_username = var.db_username
+  db_password_secret_name = "my-sql-prod-password"
 }

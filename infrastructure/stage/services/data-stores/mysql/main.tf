@@ -1,13 +1,4 @@
 terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "5.100"
-    }
-  }
-}
-
-terraform {
   backend "s3" {
     bucket         = "terraform-state-cires-ac-terraform-up-and-running"
     key            = "stage/services/data-stores/mysql/terraform.tfstate"
@@ -28,12 +19,6 @@ variable "db_username" {
   sensitive = true
 }
 
-variable "db_password" {
-  description = "The password of the database"
-  type = string
-  sensitive = true
-}
-
 module "mysql" {
   source = "../../../../modules/services/data-stores/mysql"
 
@@ -41,6 +26,6 @@ module "mysql" {
   db_instance_class = "db.t3.micro"
 
   db_name     = "test"
-  db_password = var.db_password
   db_username = var.db_username
+  db_password_secret_name = "my-sql-stage-password"
 }

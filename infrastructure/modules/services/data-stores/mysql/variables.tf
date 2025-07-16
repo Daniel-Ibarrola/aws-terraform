@@ -4,12 +4,6 @@ variable "db_username" {
   sensitive = true
 }
 
-variable "db_password" {
-  description = "The password of the database"
-  type = string
-  sensitive = true
-}
-
 variable "db_identifier" {
   description = "An identifier for the database"
   type = string
@@ -22,5 +16,10 @@ variable "db_name" {
 
 variable "db_instance_class" {
   description = "The instance type that will run the database e.g 'db.t3.micro'"
+  type = string
+}
+
+variable "db_password_secret_name" {
+  description = "The name of the secret that stores the database password"
   type = string
 }
