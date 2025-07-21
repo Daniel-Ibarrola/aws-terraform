@@ -28,12 +28,6 @@ variable "db_username" {
   sensitive = true
 }
 
-variable "db_password" {
-  description = "The password of the database"
-  type = string
-  sensitive = true
-}
-
 module "mysql" {
   source = "../../../../modules/services/data-stores/mysql"
 
