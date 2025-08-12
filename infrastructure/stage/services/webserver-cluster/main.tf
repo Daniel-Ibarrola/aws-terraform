@@ -1,7 +1,3 @@
-provider "aws" {
-  region = "us-east-2"
-}
-
 terraform {
   backend "s3" {
     bucket         = "terraform-state-cires-ac-terraform-up-and-running"
@@ -10,7 +6,19 @@ terraform {
     dynamodb_table = "terraform-up-and-running-locks"
     encrypt        = true
   }
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "5.100"
+    }
+  }
 }
+
+provider "aws" {
+  region = "us-east-2"
+}
+
 
 module "webserver_cluster" {
   source = "../../../modules/services/webserver-cluster"

@@ -1,3 +1,20 @@
+terraform {
+  backend "s3" {
+    bucket         = "terraform-state-cires-ac-terraform-up-and-running"
+    key            = "prod/services/webserver-cluster/terraform.tfstate"
+    region         = "us-east-2"
+    dynamodb_table = "terraform-up-and-running-locks"
+    encrypt        = true
+  }
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "5.100"
+    }
+  }
+}
+
 provider "aws" {
   region = "us-east-2"
 
@@ -6,16 +23,6 @@ provider "aws" {
       Owner = "avengers"
       ManagedBy = "terraform"
     }
-  }
-}
-
-terraform {
-  backend "s3" {
-    bucket         = "terraform-state-cires-ac-terraform-up-and-running"
-    key            = "prod/services/webserver-cluster/terraform.tfstate"
-    region         = "us-east-2"
-    dynamodb_table = "terraform-up-and-running-locks"
-    encrypt        = true
   }
 }
 

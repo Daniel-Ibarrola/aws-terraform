@@ -1,14 +1,4 @@
 terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "5.100"
-    }
-  }
-  required_version = ">= 1.0"
-}
-
-terraform {
   backend "s3" {
     bucket         = "terraform-state-cires-ac-terraform-up-and-running"
     key            = "workspaces/terraform.tfstate"
@@ -19,53 +9,31 @@ terraform {
 }
 
 provider "aws" {
-  region = "us-east-2"
+  region = "us-east-1"
+  alias = "us-east-region"
 }
 
-data "terraform_remote_state" "db" {
-  backend = "s3"
-
-  config = {
-    bucket = "terraform-state-cires-ac-terraform-up-and-running"
-    key    = "stage/services/data-stores/mysql/terraform.tfstate"
-    region = "us-east-2"
-  }
+provider "aws" {
+  region = "us-west-1"
+  alias = "us-west-region"
 }
 
-resource "aws_security_group" "allow_http_and_ssh" {
-  name        = "Web Server SG"
-  description = "Allow traffic from ALB security group"
+module "ec2_instance_us_east" {
+  source = "../../../modules/services/ec2-instance"
 
-  ingress {
-    from_port       = 80
-    to_port         = 80
-    protocol        = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+  providers = {
+    aws = aws.us-east-region
   }
 
-  ingress {
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  ami = "ami-0de716d6197524dd9"
 }
 
-resource "aws_instance" "web_server" {
-  ami           = "ami-06971c49acd687c30"
-  instance_type = "t2.micro"
+module "ec2_instance_us_west" {
+  source = "../../../modules/services/ec2-instance"
 
-  user_data = templatefile("user-data.sh", {
-    db_address = data.terraform_remote_state.db.outputs.address
-    db_port    = data.terraform_remote_state.db.outputs.port
-  })
+  providers = {
+    aws = aws.us-west-region
+  }
 
-  security_groups = [aws_security_group.allow_http_and_ssh.name]
+  ami = "ami-06e11c4cc68c362dd"
 }
